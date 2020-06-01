@@ -20,11 +20,27 @@
         </b-button>
       </div>
     </div>
+
+    <hr />
+
+    <Gallery />
   </div>
 </template>
 
 <script>
-export default {};
+import Gallery from "../components/Gallery";
+
+export default {
+  components: {
+    Gallery
+  },
+
+  data() {
+    return {
+      text: ""
+    };
+  }
+};
 </script>
 
 <style>

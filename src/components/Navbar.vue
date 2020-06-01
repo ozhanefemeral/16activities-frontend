@@ -15,6 +15,7 @@
     </template>
     <template slot="end">
       <b-navbar-item tag="router-link" to="/about">About</b-navbar-item>
+      <b-navbar-item tag="router-link" to="/panel">Panel</b-navbar-item>
       <b-navbar-item @click="toggleBackground">
         Clear Background
       </b-navbar-item>
