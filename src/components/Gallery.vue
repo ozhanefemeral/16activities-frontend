@@ -68,9 +68,7 @@ export default {
 
     getAllImages() {
       ImageService.GetAllImages().then(images => {
-        this.images = images.map(
-          filename => "http://192.168.1.24:3000/uploads/" + filename
-        );
+        this.images = images;
       });
     },
 
