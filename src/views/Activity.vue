@@ -10,7 +10,6 @@
       Another?
     </b-button>
 
-
     <div>
       <b-collapse animation="slide">
         <div
@@ -36,7 +35,7 @@
 
         <div class="columns is-multiline">
           <div class="column is-half">
-            <div class="columns" style="margin-top:1rem">
+            <div style="margin-top:1rem">
               <div class="column is-full">
                 <b-button
                   style="margin-top: 1rem"
