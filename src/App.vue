@@ -26,7 +26,6 @@ export default {
     },
 
     toggleBackground() {
-      console.log("toggleBackground");
       this.showImage = !this.showImage;
     }
   }
@@ -45,6 +44,7 @@ export default {
   top: 0;
   width: 100vw;
   max-height: 100vh;
+  height: 100%;
   object-fit: cover;
   filter: brightness(0.35);
 }

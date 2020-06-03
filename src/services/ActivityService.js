@@ -3,8 +3,8 @@ import axios from 'axios'
 const url = `/api/activity`
 
 class ActivityService {
-    static async GetRandomActivity(orientation) {
-        const response = await axios.get(`${url}/random`, { params: { orientation } })
+    static async GetRandomActivity() {
+        const response = await axios.get(`${url}/random`)
         return response.data
     }
 
@@ -20,6 +20,11 @@ class ActivityService {
 
     static async CreateActivity(activityBody) {
         const response = await axios.post(`${url}`, activityBody);
+        return response.data;
+    }
+
+    static async UpdateActivity(activityBody) {
+        const response = await axios.patch(`${url}/${activityBody._id}`, activityBody);
         return response.data;
     }
 }

@@ -1,44 +1,42 @@
 <template>
-  <div class="container">
+  <div class="container is-fluid" style="padding: 1rem">
     <b-button
       size="is-large"
-      type="is-primary"
+      type="is-success"
       @click="getActivity"
       :disabled="fetching"
       icon-right="dice-6"
+      style="margin-bottom:2rem"
     >
     </b-button>
-    <section class="hero">
-      <div class="hero-body">
-        <p class="title is-1 has-text-light">
-          {{ sentence }}
-        </p>
 
-        <hr />
-        <i>
-          <p class="is-6 has-text-italic has-text-grey-lighter">
-            Recommended with...
-          </p>
-        </i>
+    <p class="title is-1 has-text-white">
+      {{ sentence }}
+    </p>
 
-        <div style="marginTop: 1rem">
-          <transition-group
-            name="list-complete"
-            class="columns is-desktop is-multiline"
-            tag="div"
-          >
-            <div
-              v-for="modifier in relatedModifiers"
-              :key="modifier._id"
-              class="column is-one-quarter list-complete-item"
-              @click="applyModifier(modifier)"
-            >
-              <Modifier :modifier="modifier" />
-            </div>
-          </transition-group>
+    <hr />
+    <i>
+      <p class="is-6 has-text-italic has-text-grey-lighter">
+        Recommended with...
+      </p>
+    </i>
+
+    <div style="marginTop: 1rem">
+      <transition-group
+        name="list-complete"
+        class="columns is-multiline is-mobile"
+        tag="div"
+      >
+        <div
+          v-for="modifier in relatedModifiers"
+          :key="modifier._id"
+          class="list-complete-item column is-one-quarter-tablet is-half-mobile"
+          @click="applyModifier(modifier)"
+        >
+          <Modifier :modifier="modifier" :orientation="orientation" />
         </div>
-      </div>
-    </section>
+      </transition-group>
+    </div>
   </div>
 </template>
 <script>
@@ -53,68 +51,52 @@ export default {
     Modifier
   },
 
+  mounted() {
+    window.addEventListener("orientationchange", this.handleOrientationChange);
+  },
+
   data: () => ({
     activity: {},
     fetching: true,
     sentence: "",
     relatedModifiers: [],
     appliedTypes: [],
-    appliedKeys: []
+    appliedKeys: [],
+    orientation: ""
   }),
 
   created() {
+    this.orientation = window.screen.orientation.type;
     this.getActivity();
   },
 
   methods: {
-    async getActivity() {
+    getActivity() {
       this.fetching = true;
       this.activity = {};
       this.relatedModifiers = [];
       this.appliedTypes = [];
       this.appliedKeys = [];
-      ActivityService.GetRandomActivity(screen.orientation.type).then(
-        activityResponse => {
-          this.activity = activityResponse.activity;
-          this.relatedModifiers = this.activity.relatedModifiers;
+      ActivityService.GetRandomActivity().then(activity => {
+        this.activity = activity;
+        this.relatedModifiers = this.activity.relatedModifiers;
+        this.sentence = activity.sentence;
+        this.appliedKeys.push(this.activity.keys);
 
-          let photoPromises = [];
-
-          for (var i = 0; i < this.relatedModifiers.length; i++) {
-            photoPromises.push(
-              ModifierService.GetModifierPhoto(
-                this.relatedModifiers[i]._id,
-                screen.orientation.type
-              )
-            );
-          }
-
-          Promise.all(photoPromises).then(values => {
-            for (let index = 0; index < values.length; index++) {
-              this.$set(
-                this.relatedModifiers[index],
-                "photo",
-                values[index].photo
-              );
-            }
-          });
-
-          // Promise.all(photoPromises).then(photos => {
-          //   for (let index = 0; index < photos.length; index++) {
-          //     const element = photos[index];
-          //     this.relatedModifiers[index].photo = element;
-          //   }
-          // });
-
-          this.sentence = activityResponse.activity.sentence;
-          this.appliedKeys.push(this.activity.keys);
-          this.$emit("updateBackground", activityResponse.photo);
-          this.fetching = false;
+        let imgUrl = "/uploads/";
+        if (process.env.NODE_ENV === "development") {
+          imgUrl = "http://localhost:3000/uploads/";
         }
-      );
+        if (screen.orientation.type === "landscape-primary") {
+          this.$emit("updateBackground", imgUrl + activity.landscapeImage);
+        } else if (screen.orientation.type === "portrait-primary") {
+          this.$emit("updateBackground", imgUrl + activity.portraitImage);
+        }
+        this.fetching = false;
+      });
     },
 
-    async applyModifier(modifier) {
+    applyModifier(modifier) {
       this.sentence += " " + modifier.sentence;
       this.appliedTypes.push(modifier.type);
       this.appliedKeys.push(modifier.keys);
@@ -131,6 +113,10 @@ export default {
 
         this.$emit("updateBackground", modifier.photo);
       });
+    },
+
+    handleOrientationChange() {
+      this.orientation = window.screen.orientation.type;
     }
   }
 };
@@ -138,8 +124,14 @@ export default {
 
 <style scoped>
 .list-complete-item {
-  transition: all 1s;
+  transition: all 0.75s;
+  opacity: 0.2;
 }
+
+.list-complete-item:hover {
+  opacity: 1;
+}
+
 .list-complete-enter, .list-complete-leave-to
 /* .list-complete-leave-active below version 2.1.8 */ {
   opacity: 0;

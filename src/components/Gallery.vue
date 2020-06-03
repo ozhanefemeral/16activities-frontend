@@ -6,6 +6,16 @@
       @click="openGallery"
     />
 
+    <span
+      style="margin-left: 1rem"
+      v-if="showFileName == 'true' && selectedImageIndex"
+      class="has-text-success"
+    >
+      {{
+        images[selectedImageIndex].replace("http://localhost:3000/uploads/", "")
+      }}
+    </span>
+
     <b-modal :active.sync="showGalleryModal" scroll="keep">
       <div class="card" style="border-radius: 10px">
         <div class="card-content">
@@ -50,7 +60,9 @@ export default {
     UploadImage
   },
 
-  props: ["choiceIndex", "resultIndex"],
+  name: "Gallery",
+
+  props: ["choiceIndex", "resultIndex", "emitName", "target", "showFileName"],
 
   data() {
     return {
@@ -64,11 +76,18 @@ export default {
     openGallery() {
       this.getAllImages();
       this.showGalleryModal = true;
+      console.log(this.target);
     },
 
     getAllImages() {
       ImageService.GetAllImages().then(images => {
-        this.images = images;
+        if (process.env.NODE_ENV === "development") {
+          this.images = images.map(
+            item => "http://localhost:3000/uploads/" + item
+          );
+        } else {
+          this.images = images.map(item => "/uploads/" + item);
+        }
       });
     },
 
@@ -77,11 +96,14 @@ export default {
     },
 
     select() {
-      this.$emit("imageSelected", {
-        image: this.images[this.selectedImageIndex],
-        choiceIndex: this.choiceIndex,
-        resultIndex: this.resultIndex
-      });
+      this.$emit(
+        "imageSelected",
+        this.images[this.selectedImageIndex].replace(
+          "http://localhost:3000/uploads/",
+          ""
+        ),
+        this.target
+      );
       this.showGalleryModal = false;
     }
   }

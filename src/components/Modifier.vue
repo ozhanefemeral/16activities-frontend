@@ -2,12 +2,12 @@
   <div class="card">
     <div class="card-image">
       <figure class="image">
-        <img :src="imageURL" />
+        <img :src="image" />
       </figure>
     </div>
     <div class="card-content">
       <div class="content">
-        <p class="title is-3">
+        <p>
           {{ modifier.sentence }}
         </p>
       </div>
@@ -16,21 +16,24 @@
 </template>
 
 <script>
-import ModifierService from "../services/ModifierService";
 export default {
-  props: ["modifier"],
-  data: function() {
-    return {
-      imageURL: ""
-    };
-  },
-  created() {
-    ModifierService.GetModifierPhoto(
-      this.modifier._id,
-      "landscape-primary"
-    ).then(result => {
-      this.imageURL = result.photo;
-    });
+  props: ["modifier", "orientation"],
+  computed: {
+    image() {
+      let imgUrl = "";
+
+      if (this.orientation === "landscape-primary") {
+        imgUrl = this.modifier.landscapeImage;
+      } else if (this.orientation === "portrait-primary") {
+        imgUrl = this.modifier.portraitImage;
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        imgUrl = "http://localhost:3000/uploads/" + imgUrl;
+      }
+
+      return imgUrl;
+    }
   }
 };
 </script>

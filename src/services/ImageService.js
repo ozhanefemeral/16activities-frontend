@@ -13,8 +13,6 @@ class ImageService {
         formData.append('image', image);
 
         const response = await axios.post(`${url}/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-        console.log(response);
-
         return response.data;
     }
 }
