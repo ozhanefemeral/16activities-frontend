@@ -85,13 +85,13 @@ export default {
           this.images = [];
           return;
         }
-        
+
         if (process.env.NODE_ENV === "development") {
           this.images = images.map(
             item => "http://localhost:3000/uploads/" + item
           );
         } else {
-          this.images = images.map(item => "/uploads/" + item);
+          this.images = images;
         }
       });
     },
