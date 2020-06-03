@@ -5,7 +5,7 @@
         <b class="is-size-4 has-text-primary">16activities.com</b>
       </b-navbar-item>
     </template>
-    <template slot="start">
+    <template slot="start" v-if="userType.length > 0">
       <b-navbar-item tag="router-link" to="/activities">
         Activities
       </b-navbar-item>
@@ -13,11 +13,11 @@
         Blogs
       </b-navbar-item>
     </template>
-    <template slot="end">
+    <template slot="end" v-if="userType.length > 0">
       <b-navbar-item tag="router-link" to="/about">About</b-navbar-item>
       <b-navbar-item tag="router-link" to="/panel">Panel</b-navbar-item>
-      <b-navbar-item @click="toggleBackground">
-        Clear Background
+      <b-navbar-item>
+        <b-switch v-model="toggle">Default</b-switch>
       </b-navbar-item>
     </template>
   </b-navbar>
@@ -25,9 +25,21 @@
 
 <script>
 export default {
-  methods: {
-    toggleBackground() {
-      this.$emit("toggleBackground");
+  data() {
+    return {
+      toggle: true
+    };
+  },
+
+  computed: {
+    userType() {
+      return this.$store.state.type;
+    },
+  },
+
+  watch: {
+    toggle(){
+      this.$store.commit('setUseDynamicBackground', this.toggle);
     }
   }
 };

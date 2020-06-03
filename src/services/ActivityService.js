@@ -27,6 +27,11 @@ class ActivityService {
         const response = await axios.patch(`${url}/${activityBody._id}`, activityBody);
         return response.data;
     }
+
+    static async LikeActivity(activityId, type) {
+        const response = await axios.post(`${url}/like/${activityId}`, {}, { params: { type } });
+        return response.data;
+    }
 }
 
 export default ActivityService;

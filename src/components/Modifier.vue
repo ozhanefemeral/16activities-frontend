@@ -1,6 +1,12 @@
 <template>
   <div class="card">
-    <div class="card-image">
+    <div
+      class="card-image"
+      v-if="
+        image != 'http://localhost:3000/uploads/undefined' &&
+          image != 'undefined'
+      "
+    >
       <figure class="image">
         <img :src="image" />
       </figure>

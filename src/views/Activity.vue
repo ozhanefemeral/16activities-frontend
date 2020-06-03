@@ -1,41 +1,84 @@
 <template>
   <div class="container is-fluid" style="padding: 1rem">
     <b-button
-      size="is-large"
       type="is-success"
       @click="getActivity"
       :disabled="fetching"
       icon-right="dice-6"
-      style="margin-bottom:2rem"
+      style="margin: 1rem 0rem"
     >
+      Another?
     </b-button>
 
-    <p class="title is-1 has-text-white">
-      {{ sentence }}
-    </p>
 
-    <hr />
-    <i>
-      <p class="is-6 has-text-italic has-text-grey-lighter">
-        Recommended with...
-      </p>
-    </i>
-
-    <div style="marginTop: 1rem">
-      <transition-group
-        name="list-complete"
-        class="columns is-multiline is-mobile"
-        tag="div"
-      >
+    <div>
+      <b-collapse animation="slide">
         <div
-          v-for="modifier in relatedModifiers"
-          :key="modifier._id"
-          class="list-complete-item column is-one-quarter-tablet is-half-mobile"
-          @click="applyModifier(modifier)"
+          slot="trigger"
+          slot-scope="props"
+          class="card-header"
+          role="button"
         >
-          <Modifier :modifier="modifier" :orientation="orientation" />
+          <span
+            class="is-size-1 is-size-2-mobile has-text-white has-text-weight-bold"
+            :class="{ 'has-text-black': !dynamicBackground }"
+          >
+            {{ sentence }}
+          </span>
+
+          <a class="card-header-icon has-text-white">
+            <b-icon
+              :icon="props.open ? 'chevron-down-circle' : 'chevron-up-circle'"
+            >
+            </b-icon>
+          </a>
         </div>
-      </transition-group>
+
+        <div class="columns is-multiline">
+          <div class="column is-half">
+            <div class="columns" style="margin-top:1rem">
+              <div class="column is-full">
+                <b-button
+                  style="margin-top: 1rem"
+                  expanded
+                  type="is-danger"
+                  icon-left="heart"
+                  @click="likeActivity"
+                ></b-button>
+              </div>
+              <div class="column is-full">
+                <div class="card" v-if="activity.likes">
+                  <div class="card-content">
+                    Most liked by: {{ mostLikedType }} -
+                    {{ activity.likes[mostLikedType] }}
+                    <br />
+                    Your type liked ({{ $store.state.type }}):
+                    {{ activity.likes[$store.state.type] }}
+                    <br />
+                    Total likes: {{ activity.totalLikes }}
+                  </div>
+                </div>
+              </div>
+              <div style="marginTop: 1rem" class="column is-full">
+                <transition-group
+                  name="list-complete"
+                  class="columns is-multiline is-mobile"
+                  tag="div"
+                >
+                  <div
+                    v-for="modifier in relatedModifiers"
+                    :key="modifier._id"
+                    class="list-complete-item column is-one-quarter-tablet is-half-mobile"
+                    @click="applyModifier(modifier)"
+                  >
+                    <Modifier :modifier="modifier" :orientation="orientation" />
+                  </div>
+                </transition-group>
+              </div>
+            </div>
+          </div>
+        </div>
+      </b-collapse>
     </div>
   </div>
 </template>
@@ -61,8 +104,9 @@ export default {
     sentence: "",
     relatedModifiers: [],
     appliedTypes: [],
-    appliedKeys: [],
-    orientation: ""
+    orientation: "",
+    mostLikedType: "",
+    alreadyLiked: false
   }),
 
   created() {
@@ -71,26 +115,68 @@ export default {
   },
 
   methods: {
+    likeActivity() {
+      if (this.alreadyLiked) {
+        this.$buefy.dialog.alert({
+          message: "You already liked it",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "times-circle",
+          ariaModal: true
+        });
+        return;
+      }
+
+      ActivityService.LikeActivity(this.activity._id, this.type).then(() => {
+        this.alreadyLiked = true;
+        this.activity.totalLikes++;
+        this.$set(
+          this.activity.likes,
+          [this.type],
+          this.activity.likes[this.type] + 1
+        );
+
+        if (
+          this.activity.likes[this.type] >=
+          this.activity.likes[this.mostLikedType]
+        ) {
+          this.mostLikedType = this.type;
+        }
+      });
+    },
+
     getActivity() {
+      this.alreadyLiked = false;
       this.fetching = true;
       this.activity = {};
       this.relatedModifiers = [];
       this.appliedTypes = [];
-      this.appliedKeys = [];
+
       ActivityService.GetRandomActivity().then(activity => {
         this.activity = activity;
         this.relatedModifiers = this.activity.relatedModifiers;
         this.sentence = activity.sentence;
-        this.appliedKeys.push(this.activity.keys);
+        if (activity.likes != 0) {
+          let max = 0;
+          const likes = activity.likes;
+          for (const key in likes) {
+            if (likes[key] > max) {
+              max = likes[key];
+              this.mostLikedType = key;
+            }
+          }
+        }
 
         let imgUrl = "";
         if (process.env.NODE_ENV === "development") {
-          let imgUrl = "http://localhost:3000/uploads/";
+          imgUrl = "http://localhost:3000/uploads/";
         }
-        if (screen.orientation.type === "landscape-primary") {
-          this.$emit("updateBackground", imgUrl + activity.landscapeImage);
-        } else if (screen.orientation.type === "portrait-primary") {
-          this.$emit("updateBackground", imgUrl + activity.portraitImage);
+        if (screen.orientation.type === "portrait-primary") {
+          imgUrl += activity.landscapeImage;
+          this.$store.commit("setBackgroundUrl", imgUrl);
+        } else {
+          imgUrl += activity.portraitImage;
+          this.$store.commit("setBackgroundUrl", imgUrl);
         }
         this.fetching = false;
       });
@@ -117,6 +203,15 @@ export default {
 
     handleOrientationChange() {
       this.orientation = window.screen.orientation.type;
+    }
+  },
+
+  computed: {
+    type() {
+      return this.$store.state.type;
+    },
+    dynamicBackground() {
+      return this.$store.state.useDynamicBackground;
     }
   }
 };

@@ -1,9 +1,14 @@
 <template>
   <div>
-    <Navbar @toggleBackground="toggleBackground" />
-    <img v-if="showImage" id="bg" :src="imageURL" alt="" srcset="" />
-
-    <router-view @updateBackground="setBackground"></router-view>
+    <Navbar />
+    <img
+      v-if="useDynamicBackground"
+      id="bg"
+      :src="backgroundUrl"
+      alt=""
+      srcset=""
+    />
+    <router-view></router-view>
   </div>
 </template>
 
@@ -16,17 +21,17 @@ export default {
   },
   data: function() {
     return {
-      imageURL: "",
-      showImage: true
+      imageURL: ""
     };
   },
-  methods: {
-    setBackground(url) {
-      this.imageURL = url;
+
+  computed: {
+    useDynamicBackground() {
+      return this.$store.state.useDynamicBackground;
     },
 
-    toggleBackground() {
-      this.showImage = !this.showImage;
+    backgroundUrl() {
+      return this.$store.state.backgroundUrl;
     }
   }
 };
@@ -34,7 +39,6 @@ export default {
 
 <style>
 .container {
-  text-align: center;
   padding: 3rem;
 }
 #bg {
@@ -46,6 +50,6 @@ export default {
   max-height: 100vh;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.35);
+  filter: brightness(0.25);
 }
 </style>

@@ -8,7 +8,8 @@ import CreateActivity from "../views/CreateActivity";
 import CreateBlog from "../views/CreateBlog";
 import Activity from "../views/Activity";
 import ViewBlog from '../views/ViewBlog';
-
+import TypeSelect from '../views/TypeSelect';
+import store from '../store/index'
 
 Vue.use(VueRouter)
 
@@ -17,6 +18,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/type-select',
+    name: 'TypeSelect',
+    component: TypeSelect
   },
   {
     path: '/activities',
@@ -57,6 +63,15 @@ const routes = [
 
 const router = new VueRouter({
   routes
+})
+
+const types = [
+  "ENTP", "ENTJ", "INTJ", "INTP", "ESTP", "ESTJ", "ISTP", "ISTJ", "ISFJ", "ISFP", "ESFP", "ESFJ", "ENFJ", "INFJ", "INFP", "ENFP"
+]
+
+router.beforeEach((to, from, next) => {
+  if (to.name !== 'TypeSelect' && !types.includes(store.state.type)) next({ name: 'TypeSelect' })
+  else next()
 })
 
 export default router
