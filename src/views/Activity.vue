@@ -83,9 +83,9 @@ export default {
         this.sentence = activity.sentence;
         this.appliedKeys.push(this.activity.keys);
 
-        let imgUrl = "/uploads/";
+        let imgUrl = "";
         if (process.env.NODE_ENV === "development") {
-          imgUrl = "http://localhost:3000/uploads/";
+          let imgUrl = "http://localhost:3000/uploads/";
         }
         if (screen.orientation.type === "landscape-primary") {
           this.$emit("updateBackground", imgUrl + activity.landscapeImage);
