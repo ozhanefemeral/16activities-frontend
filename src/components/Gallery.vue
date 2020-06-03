@@ -81,6 +81,11 @@ export default {
 
     getAllImages() {
       ImageService.GetAllImages().then(images => {
+        if (!images) {
+          this.images = [];
+          return;
+        }
+        
         if (process.env.NODE_ENV === "development") {
           this.images = images.map(
             item => "http://localhost:3000/uploads/" + item
