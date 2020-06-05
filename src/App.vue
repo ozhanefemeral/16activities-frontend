@@ -50,6 +50,6 @@ export default {
   max-height: 100vh;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.25);
+  filter: brightness(0.4);
 }
 </style>

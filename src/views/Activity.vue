@@ -120,7 +120,7 @@ export default {
           message: "You already liked it",
           type: "is-danger",
           hasIcon: true,
-          icon: "times-circle",
+          icon: "close-octagon",
           ariaModal: true
         });
         return;
@@ -167,10 +167,10 @@ export default {
         }
 
         let imgUrl = "";
-        if (process.env.NODE_ENV === "development") {
-          imgUrl = "http://localhost:3000/uploads/";
-        }
-        if (screen.orientation.type === "portrait-primary") {
+        // if (process.env.NODE_ENV === "development") {
+        //   imgUrl = "http://localhost:3000/api/images/";
+        // }
+        if (screen.orientation.type === "landscape-primary") {
           imgUrl += activity.landscapeImage;
           this.$store.commit("setBackgroundUrl", imgUrl);
         } else {
@@ -184,19 +184,12 @@ export default {
     applyModifier(modifier) {
       this.sentence += " " + modifier.sentence;
       this.appliedTypes.push(modifier.type);
-      this.appliedKeys.push(modifier.keys);
-      ModifierService.ApplyModifier(
-        this.appliedKeys.join(" "),
-        modifier._id,
-        screen.orientation.type
-      ).then(modifier => {
+      ModifierService.ApplyModifier(modifier._id).then(() => {
         let filtered = this.relatedModifiers.filter(
           modifier => !this.appliedTypes.includes(modifier.type)
         );
 
         this.relatedModifiers = filtered;
-
-        this.$emit("updateBackground", modifier.photo);
       });
     },
 

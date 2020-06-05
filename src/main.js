@@ -12,6 +12,8 @@ Vue.use(Buefy, { defaultIconPack: 'mdi' });
 
 Vue.config.productionTip = false
 
+console.log(process.env.NODE_ENV);
+
 const types = [
   "ENTP", "ENTJ", "INTJ", "INTP", "ESTP", "ESTJ", "ISTP", "ISTJ", "ISFJ", "ISFP", "ESFP", "ESFJ", "ENFJ", "INFJ", "INFP", "ENFP"
 ]

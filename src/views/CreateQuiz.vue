@@ -177,7 +177,6 @@ export default {
     },
 
     removeResult(index) {
-      console.log(index);
       this.selectedQuiz.results.splice(index, 1);
     },
 

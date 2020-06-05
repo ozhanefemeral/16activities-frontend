@@ -50,8 +50,7 @@ export default {
         name: this.name,
         content: this.content,
         image: this.image
-      }).then(published => {
-        console.log(published);
+      }).then(() => {
         this.$router.push("Blogs");
       });
     },

@@ -57,18 +57,51 @@
             >
             </b-taginput>
           </b-field>
-          <b-button @click="saveActivity" type="is-success">Save</b-button>
+          <div class="columns">
+            <div class="column is-half">
+              <b-button @click="saveActivity" type="is-success" expanded>
+                Save
+              </b-button>
+            </div>
+            <div class="column is-half">
+              <b-button
+                @click="deleteActivity"
+                type="is-danger"
+                icon-right="delete"
+                style="margin-left: 1rem"
+                expanded
+              ></b-button>
+            </div>
+          </div>
+
           <hr />
 
           <p class="is-size-1 has-text-black has-text-weight-bold">Modifier</p>
-          <b-field label="Modifier">
-            <b-input v-model="modifierSentence"></b-input>
-          </b-field>
+          <div class="columns">
+            <div class="column">
+              <b-field label="Modifier">
+                <b-input v-model="modifierSentence"></b-input>
+              </b-field>
+            </div>
+            <div class="column">
+              <b-field label="Mevcut aktivite" v-if="allActivities">
+                <b-autocomplete
+                  v-model="searchModifierSentence"
+                  open-on-focus
+                  :data="filteredModifiers"
+                  field="sentence"
+                  @select="option => (selectedModifier = option)"
+                >
+                </b-autocomplete>
+              </b-field>
+            </div>
+          </div>
+
           <b-field label="Type">
             <b-select v-model="modifierType">
               <option value="Place">Place</option>
-              <option value="Place">Time</option>
-              <option value="Place">People</option>
+              <option value="Time">Time</option>
+              <option value="People">People</option>
             </b-select>
           </b-field>
           <!-- <div class="columns">
@@ -134,7 +167,22 @@
         </b-button>
       </div>
     </div> -->
-          <b-button @click="createModifier" type="is-success">Create</b-button>
+          <div class="columns">
+            <div class="column is-half">
+              <b-button @click="saveModifier" type="is-success" expanded>
+                Save
+              </b-button>
+            </div>
+            <div class="column is-half">
+              <b-button
+                expanded
+                @click="deleteModifier"
+                type="is-danger"
+                icon-right="delete"
+                style="margin-left: 1rem"
+              ></b-button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -157,6 +205,7 @@ export default {
       activitySentence: "",
       modifierSentence: "",
       searchSentence: "",
+      searchModifierSentence: "",
       modifierType: "",
       filteredTags: [],
       landscapeImage: "",
@@ -164,7 +213,8 @@ export default {
       isSelectOnly: false,
       relatedModifiers: [],
       uniqueImages: [],
-      selectedActivity: "",
+      selectedActivity: {},
+      selectedModifier: {},
       allActivities: [],
       allModifiers: []
     };
@@ -220,7 +270,7 @@ export default {
 
       this.fetching = true;
 
-      if (this.selectedActivity) {
+      if (this.selectedActivity._id) {
         activityBody._id = this.selectedActivity._id;
         ActivityService.UpdateActivity(activityBody).then(() => {
           this.fetching = false;
@@ -234,18 +284,29 @@ export default {
       }
     },
 
-    createModifier() {
+    saveModifier() {
       this.fetching = true;
-      ModifierService.CreateModifier({
+      let modifierBody = {
         sentence: this.modifierSentence,
-        type: this.modifierType,
-        landscapeImage: this.modifierLandscapeImageName,
-        portraitImage: this.modifierPortraitImageName
-      }).then(modifier => {
-        this.fetching = false;
-        this.allModifiers.push(modifier);
-        this.showSuccessDialog();
-      });
+        type: this.modifierType
+      };
+
+      if (this.selectedModifier._id) {
+        modifierBody._id = this.selectedModifier._id;
+        ModifierService.UpdateModifier(modifierBody).then(() => {
+          this.fetching = false;
+          this.showSuccessDialog();
+        });
+      } else {
+        ModifierService.CreateModifier({
+          sentence: this.modifierSentence,
+          type: this.modifierType
+        }).then(modifier => {
+          this.fetching = false;
+          this.allModifiers.push(modifier);
+          this.showSuccessDialog();
+        });
+      }
     },
 
     showSuccessDialog() {
@@ -259,8 +320,6 @@ export default {
     },
 
     onImageSelected(image, target) {
-      console.log(target);
-
       this[target] = image;
     },
 
@@ -268,7 +327,27 @@ export default {
       this.selectedTest.questions.push({});
     },
 
-    deleteActivity() {}
+    deleteActivity() {
+      ActivityService.DeleteActivity(this.selectedActivity._id).then(() => {
+        const index = this.allActivities.findIndex(
+          act => (act._id = this.selectedActivity._id)
+        );
+        this.allActivities.splice(index, 1);
+        this.selectedActivity = {};
+        this.showSuccessDialog();
+      });
+    },
+
+    deleteModifier() {
+      ModifierService.DeleteActivity(this.selectedModifier._id).then(() => {
+        const index = this.allModifiers.findIndex(
+          act => (act._id = this.selectedModifier._id)
+        );
+        this.allModifiers.splice(index, 1);
+        this.selectedModifier = {};
+        this.showSuccessDialog();
+      });
+    }
   },
 
   computed: {
@@ -279,6 +358,20 @@ export default {
       return this.allActivities.filter(activity => {
         return (
           activity.sentence
+            .toString()
+            .toLowerCase()
+            .indexOf(this.searchSentence.toLowerCase()) >= 0
+        );
+      });
+    },
+
+    filteredModifiers() {
+      if (this.allModifiers.length == 0) {
+        return;
+      }
+      return this.allModifiers.filter(modifier => {
+        return (
+          modifier.sentence
             .toString()
             .toLowerCase()
             .indexOf(this.searchSentence.toLowerCase()) >= 0
@@ -303,6 +396,18 @@ export default {
       this.portraitImage = selectedActivity.portraitImage;
       this.landscapeImage = selectedActivity.landscapeImage;
       this.relatedModifiers = selectedActivity.relatedModifiers;
+    },
+
+    selectedModifier: function() {
+      let selectedModifier = this.selectedModifier;
+
+      if (!selectedModifier) {
+        this.modifierSentence = "";
+        return;
+      }
+
+      this.modifierSentence = selectedModifier.sentence;
+      this.modifierType = selectedModifier.type;
     }
   }
 };
