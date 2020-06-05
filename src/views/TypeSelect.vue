@@ -7,34 +7,25 @@
         icon-prev="chevron-left"
         icon-next="chevron-right"
       >
-        <b-carousel-item>
-          <img
-            width="80%"
-            style="max-width:400px"
-            src="../assets/person-1.svg"
-          />
+        <b-carousel-item v-for="(type, index) in types" :key="index">
+          <center>
+            <div class="content">
+              <p
+                class="is-size-1 has-text-primary has-text-weight-bold"
+                style="margin:-1rem"
+              >
+                {{ type }}
+              </p>
+            </div>
+
+            <img
+              width="80%"
+              style="max-width:400px;"
+              :src="require(`@/assets/${type}.svg`)"
+            />
+          </center>
+          <!-- <img src="../assets/ENTP.svg" width="80%" style="max-width: 400px" /> -->
         </b-carousel-item>
-        <b-carousel-item>
-          <img
-            width="80%"
-            style="max-width:400px"
-            src="../assets/person-2.svg"
-          />
-        </b-carousel-item>
-        <b-carousel-item>
-          <img
-            width="80%"
-            style="max-width:400px"
-            src="../assets/person-3.svg"
-          />
-        </b-carousel-item>
-        <!-- <b-carousel-item v-for="n in 16" :key="n">
-        <img
-          width="80%"
-          style="max-width:400px"
-          :src="'../assets/person-' + n + '.svg'"
-        />
-      </b-carousel-item> -->
       </b-carousel>
 
       <b-button
@@ -54,7 +45,7 @@ export default {
   data() {
     return {
       autoplay: false,
-      types: ["INFJ", "ESFP", "INFP"],
+      types: ["INFJ", "ENTP", "ISFP", "INFP", "ESFP"],
       currentType: "INFJ"
     };
   },
@@ -67,8 +58,8 @@ export default {
       this.$store.commit("setType", this.currentType);
       this.$buefy.dialog.confirm({
         message: "Should we remember you next time?",
-        cancelText: 'no, I am a ninja 🐱‍👤',
-        confirmText: 'yes, please 🤴',
+        cancelText: "no, I am a ninja 🐱‍👤",
+        confirmText: "yes, please 🤴",
         onConfirm: () => {
           localStorage.type = this.currentType;
           this.$router.push("activities");

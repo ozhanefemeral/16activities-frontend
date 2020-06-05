@@ -11,7 +11,7 @@
     </b-button>
 
     <div>
-      <b-collapse animation="slide">
+      <b-collapse animation="slide" ref="details">
         <div
           slot="trigger"
           slot-scope="props"
@@ -177,6 +177,7 @@ export default {
           imgUrl += activity.portraitImage;
           this.$store.commit("setBackgroundUrl", imgUrl);
         }
+        this.$refs.details.isOpen = false;
         this.fetching = false;
       });
     },
