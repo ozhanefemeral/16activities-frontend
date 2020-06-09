@@ -1,5 +1,5 @@
 module.exports = {
-  "outputDir": "C:\\Users\\ozhan\\Desktop\\iş\\JS\\experienceforme\\server\\public",
+  "outputDir": "E:\\masaüstü\\iş\\JS\\experienceforme\\server\\public",
   "devServer": {
     proxy: {
       '/api': {

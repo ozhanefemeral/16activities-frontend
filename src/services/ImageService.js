@@ -15,6 +15,7 @@ class ImageService {
         const response = await axios.post(`${url}/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
         return response.data;
     }
+
 }
 
 export default ImageService;

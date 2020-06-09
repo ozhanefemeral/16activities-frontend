@@ -58,7 +58,7 @@ export default {
       this.$store.commit("setType", this.currentType);
       this.$buefy.dialog.confirm({
         message: "Should we remember you next time?",
-        cancelText: "no, I am a ninja 🐱‍👤",
+        cancelText: "no, I am hiding 👀",
         confirmText: "yes, please 🤴",
         onConfirm: () => {
           localStorage.type = this.currentType;

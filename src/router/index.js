@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home';
+import Memes from '../views/Memes';
 import Blogs from '../views/Blogs';
 import Panel from "../views/Panel";
 import CreateQuiz from "../views/CreateQuiz";
 import CreateActivity from "../views/CreateActivity";
 import CreateBlog from "../views/CreateBlog";
+import CreateMeme from "../views/CreateMeme";
 import Activity from "../views/Activity";
 import ViewBlog from '../views/ViewBlog';
 import TypeSelect from '../views/TypeSelect';
@@ -14,11 +15,6 @@ import store from '../store/index'
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
   {
     path: '/type-select',
     name: 'TypeSelect',
@@ -33,6 +29,11 @@ const routes = [
     path: '/blogs',
     name: 'Blogs',
     component: Blogs
+  },
+  {
+    path: '/memes',
+    name: 'Memes',
+    component: Memes
   },
   {
     path: '/panel',
@@ -53,6 +54,11 @@ const routes = [
     path: '/panel/create-blog',
     name: 'CreateBlog',
     component: CreateBlog
+  },
+  {
+    path: '/panel/create-meme',
+    name: 'CreateMeme',
+    component: CreateMeme
   },
   {
     path: '/blog/:blogName',

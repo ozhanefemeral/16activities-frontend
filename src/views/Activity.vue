@@ -167,9 +167,7 @@ export default {
         }
 
         let imgUrl = "";
-        // if (process.env.NODE_ENV === "development") {
-        //   imgUrl = "http://localhost:3000/api/images/";
-        // }
+
         if (screen.orientation.type === "landscape-primary") {
           imgUrl += activity.landscapeImage;
           this.$store.commit("setBackgroundUrl", imgUrl);
@@ -177,6 +175,8 @@ export default {
           imgUrl += activity.portraitImage;
           this.$store.commit("setBackgroundUrl", imgUrl);
         }
+        console.log(imgUrl);
+
         this.$refs.details.isOpen = false;
         this.fetching = false;
       });

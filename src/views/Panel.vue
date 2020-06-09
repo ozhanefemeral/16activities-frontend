@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="columns">
+    <div class="columns" v-if="isLoggedIn">
       <div class="column">
         <b-button
           type="is-primary"
@@ -19,28 +19,59 @@
           Create Blog
         </b-button>
       </div>
+      <div class="column">
+        <b-button type="is-primary" @click="$router.push('/panel/create-meme')">
+          Create Meme
+        </b-button>
+      </div>
     </div>
 
     <hr />
-
-    <Gallery />
+    <b-modal
+      :active.sync="isComponentModalActive"
+      has-modal-card
+      :destroy-on-hide="false"
+      aria-role="dialog"
+      aria-modal
+    >
+      <Login @loginResult="onLoginResult" />
+    </b-modal>
   </div>
 </template>
 
 <script>
-import Gallery from "../components/Gallery";
+import Login from "../components/Login";
 
 export default {
   components: {
-    Gallery
+    Login
   },
+
+  created() {},
 
   data() {
     return {
-      text: ""
+      isComponentModalActive: true,
+      isLoggedIn: false
     };
   },
 
+  methods: {
+    onLoginResult(result) {
+      if (result == 200) {
+        this.isComponentModalActive = false;
+        this.isLoggedIn = true;
+      } else {
+        this.$buefy.dialog.alert({
+          message: "Try again",
+          type: "is-danger",
+          hasIcon: true,
+          icon: "close-octagon",
+          ariaModal: true
+        });
+      }
+    }
+  }
 };
 </script>
 
