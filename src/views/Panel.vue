@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="columns" v-if="isLoggedIn">
+    <div class="columns">
       <div class="column">
         <b-button
           type="is-primary"
@@ -27,7 +27,7 @@
     </div>
 
     <hr />
-    <b-modal
+    <!-- <b-modal
       :active.sync="isComponentModalActive"
       has-modal-card
       :destroy-on-hide="false"
@@ -35,42 +35,42 @@
       aria-modal
     >
       <Login @loginResult="onLoginResult" />
-    </b-modal>
+    </b-modal> -->
   </div>
 </template>
 
 <script>
-import Login from "../components/Login";
+// import Login from "../components/Login";
 
 export default {
   components: {
-    Login
+    // Login
   },
 
   created() {},
 
   data() {
     return {
-      isComponentModalActive: true,
-      isLoggedIn: false
+      // isComponentModalActive: true,
+      // isLoggedIn: false
     };
   },
 
   methods: {
-    onLoginResult(result) {
-      if (result == 200) {
-        this.isComponentModalActive = false;
-        this.isLoggedIn = true;
-      } else {
-        this.$buefy.dialog.alert({
-          message: "Try again",
-          type: "is-danger",
-          hasIcon: true,
-          icon: "close-octagon",
-          ariaModal: true
-        });
-      }
-    }
+    // onLoginResult(result) {
+    //   if (result == 200) {
+    //     this.isComponentModalActive = false;
+    //     this.isLoggedIn = true;
+    //   } else {
+    //     this.$buefy.dialog.alert({
+    //       message: "Try again",
+    //       type: "is-danger",
+    //       hasIcon: true,
+    //       icon: "close-octagon",
+    //       ariaModal: true
+    //     });
+    //   }
+    // }
   }
 };
 </script>

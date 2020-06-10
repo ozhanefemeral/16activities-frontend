@@ -31,6 +31,11 @@ class MemeService {
         const response = await axios.get(`${url}/random`, { params: { forTypes, nsfw } })
         return response.data
     }
+
+    static async GiveReaction(memeId, reaction, undo = false) {
+        const response = await axios.post(`${url}/${memeId}/react`, { reaction, undo })
+        return response.data
+    }
 }
 
 export default MemeService;

@@ -4,9 +4,18 @@
       <div class="column has-text-centered is-full is-full-mobile">
         <img :src="meme.image" alt="" style="max-height: 800px" />
       </div>
-      <div class="column has-text-centered is-full is-full-mobile">
-        <b-button v-for="(reaction, index) in reactions" :key="index" @click="giveReaction(index)">
-          {{ reaction }}
+      <div class="column has-text-centered is-full is-full-mobile" v-if="meme.reactions">
+        <b-button
+          v-for="(reaction, index) in reactions"
+          :key="index"
+          :type="{ 'is-primary': reaction.isReacted }"
+          @click="giveReaction(index)"
+          style="margin: 0.5rem"
+        >
+          <span v-if="meme.reactions">
+            {{ meme.reactions[reactions[index].value] }}
+          </span>
+          {{ reaction.emoji }}
         </b-button>
       </div>
       <div class="column is-narrow">
@@ -43,13 +52,13 @@ export default {
     meme: {},
     selectedTypes: [],
     reactions: [
-      '😂',
-      '😔',
-      '😎',
-      '😡',
-      '💩',
-      '🧠',
-      '❤',
+      { emoji: "😂", value: "funny", isReacted: false },
+      { emoji: "😔", value: "sad", isReacted: false },
+      { emoji: "😎", value: "cool", isReacted: false },
+      { emoji: "😡", value: "angry", isReacted: false },
+      { emoji: "💩", value: "tard", isReacted: false },
+      { emoji: "🧠", value: "brain", isReacted: false },
+      { emoji: "❤", value: "heart", isReacted: false }
     ],
     nsfw: false,
     types: [
@@ -79,6 +88,8 @@ export default {
       this.meme = {};
 
       MemeService.GetRandomMeme(this.selectedTypes, this.nsfw).then(meme => {
+        this.resetReactions();
+
         if (process.env.NODE_ENV === "development") {
           meme.image = "http://192.168.1.27:8080/api/memes/" + meme.image;
         } else {
@@ -101,8 +112,35 @@ export default {
       });
     },
 
-    giveReaction(index){
-      console.log(this.reactions[index]);
+    giveReaction(index) {
+      const isReacted = this.reactions[index].isReacted;
+      const value = this.reactions[index].value;
+      //if already reacted
+      let promise;
+
+      if (isReacted) {
+        this.$set(this.meme.reactions, value, this.meme.reactions[value] - 1);
+        promise = MemeService.GiveReaction(this.meme._id, value, true);
+      } else {
+        this.$set(this.meme.reactions, value, this.meme.reactions[value] + 1);
+        promise = MemeService.GiveReaction(this.meme._id, value);
+      }
+
+      promise.then(() => {
+        this.$buefy.snackbar.open({
+          position: "is-bottom",
+          message: "Saved",
+          duration: 750
+        });
+      });
+
+      this.$set(this.reactions[index], "isReacted", !isReacted);
+    },
+
+    resetReactions() {
+      for (let i = 0; i < this.reactions.length; i++) {
+        this.$set(this.reactions[i], "isReacted", false);
+      }
     }
   }
 };
